@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+progressbar.so
+progressbar.dylib
+progressbar.dll
+progressbar.a
+progressbar.lib
+progressbar-test-*
+*.exe
+*.o
+*.obj
+*.lst
+out

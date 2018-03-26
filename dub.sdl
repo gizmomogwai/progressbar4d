@@ -1,0 +1,27 @@
+name "progressbar"
+description "Ascii progressbar."
+authors "Christian Köstlin"
+copyright "Copyright © 2018, Christian Köstlin"
+license "proprietary"
+
+// dependency "colored" version="~>0.0.13"
+
+configuration "library" {
+  targetPath "out/lib"
+}
+
+configuration "example" {
+  targetPath "out/main"
+  targetType "executable"
+}
+
+configuration "unittest" {
+  targetType "executable"
+  targetName "unittest"
+  targetPath "out/test"
+
+  dependency "unit-threaded" version="~>0.7.38"
+  preBuildCommands "dub run unit-threaded -c gen_ut_main -- -f out/generated/unit-threaded/testsuite.d"
+  mainSourceFile "out/generated/unit-threaded/testsuite.d"
+  excludedSourceFiles "source/app.d"
+}
