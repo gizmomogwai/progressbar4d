@@ -9,9 +9,9 @@ void run(ProgressbarUI pb)
     pb.message("before start");
     writeln(pb.toString);
 
-    for (int i = 0; i < 25; ++i)
+    for (int i = 0; i < 100; ++i)
     {
-        pb.step(4);
+        pb.step(1);
         pb.message(" message %s".format(i));
         std.stdio.write(pb.toString ~ "\r");
         stdout.flush;
@@ -35,7 +35,9 @@ void runSpinner(T)(T[] ticks)
                        spinner(ticks, 1),
                        new Message)),
                new PercentageBar(20),
-               new PadLeft(5, new Percentage)));
+               new PadLeft(5, new Percentage),
+               new PadLeft(10, new ETA),
+        ));
     // dfmt on
 }
 

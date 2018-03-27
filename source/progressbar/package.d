@@ -157,6 +157,25 @@ class Speed : Part
     }
 }
 
+class ETA : Part {
+  import std.datetime.stopwatch;
+  StopWatch sw;
+  override string toString(Progressbar pb)
+  {
+    import core.time;
+    import std.conv;
+    if (!sw.running)
+    {
+      sw.start;
+    }
+    auto duration = float(sw.peek.total!"msecs");
+    auto totalTime = duration / pb.currentProgress;
+    import std.math;
+    auto eta = round((totalTime - duration) / 1000);
+    return "%s".format(eta);
+  }
+}
+
 class PadLeft : Part
 {
     size_t width;
