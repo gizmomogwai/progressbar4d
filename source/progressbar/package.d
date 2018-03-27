@@ -6,35 +6,18 @@ import std.conv;
 import std.string;
 import std.array;
 
-abstract class ProgressbarUI
+abstract class Part
 {
     abstract string toString(Progressbar pb);
 }
 
-auto textUi(P...)(P parts)
-{
-    return new class ProgressbarUI
-    {
-        override string toString(Progressbar pb)
-        {
-            string[] res;
-            foreach (p; parts)
-            {
-                res ~= p.toString(pb);
-            }
-            return res.join("|").to!string;
-        }
-    };
-}
-
 class Progressbar
 {
-    ProgressbarUI ui;
     size_t total;
     size_t value;
-    this(ProgressbarUI ui, size_t total, size_t value = 0)
+    string _message = "";
+    this(size_t total, size_t value = 0)
     {
-        this.ui = ui;
         this.total = total;
         this.value = value;
     }
@@ -45,21 +28,72 @@ class Progressbar
         return this;
     }
 
-    typeof(this) setUi(ProgressbarUI ui)
+    typeof(this) message(string message)
     {
-        this.ui = ui;
+        this._message = message;
         return this;
+    }
+
+    float currentProgress()
+    {
+        return value.to!float / total.to!float;
+    }
+
+    string message()
+    {
+        return _message;
+    }
+}
+
+abstract class ProgressbarUI
+{
+    Progressbar pb;
+    this(Progressbar pb)
+    {
+        this.pb = pb;
+    }
+
+    typeof(this) step(size_t step = 1)
+    {
+        pb.step(step);
+        return this;
+    }
+
+    typeof(this) message(string message)
+    {
+        pb.message(message);
+        return this;
+    }
+
+    string message()
+    {
+        return pb.message;
+    }
+}
+
+class TextProgressbarUI : ProgressbarUI
+{
+    Part[] parts;
+    this(Progressbar pb, Part[] parts)
+    {
+        super(pb);
+        this.parts = parts;
     }
 
     override string toString()
     {
-        return ui.toString(this);
+        string[] res;
+        foreach (p; parts)
+        {
+            res ~= p.toString(pb);
+        }
+        return res.join("|").to!string;
     }
 }
 
-abstract class Part
+auto textUi(P...)(Progressbar pb, P parts)
 {
-    abstract string toString(Progressbar pb);
+    return new TextProgressbarUI(pb, [parts]);
 }
 
 class Percentage : Part
@@ -67,6 +101,39 @@ class Percentage : Part
     override string toString(Progressbar pb)
     {
         return "%003.1f".format((pb.value.to!float / pb.total.to!float) * 100);
+    }
+}
+
+class PercentageBar : Part
+{
+    size_t width;
+    this(size_t width)
+    {
+        this.width = width;
+    }
+
+    override string toString(Progressbar pb)
+    {
+        string res = "";
+        for (int i = 0; i < width; ++i)
+        {
+            import std.math;
+
+            float h = floor(100 * (float(i) / float(width - 1)));
+            if (pb.currentProgress == 0)
+            {
+                res ~= " ";
+            }
+            else if (h <= pb.currentProgress * 100)
+            {
+                res ~= "#";
+            }
+            else
+            {
+                res ~= " ";
+            }
+        }
+        return res;
     }
 }
 
@@ -84,7 +151,6 @@ class Speed : Part
         {
             sw.start;
         }
-
         auto duration = sw.peek;
         auto speed = (pb.value.to!float * 1000) / duration.total!"msecs";
         return "%00.1f".format(speed);
@@ -96,7 +162,7 @@ class PadLeft : Part
     size_t width;
     Part p;
     dchar filler;
-    this(size_t width, Part p, dchar filler)
+    this(size_t width, Part p, dchar filler = ' ')
     {
         this.width = width;
         this.p = p;
@@ -107,6 +173,30 @@ class PadLeft : Part
     {
         return p.toString(pb).rightJustify(width, filler);
     }
+}
+
+class Composite : Part
+{
+    Part[] parts;
+    this(Part[] parts)
+    {
+        this.parts = parts;
+    }
+
+    override string toString(Progressbar pb)
+    {
+        string res = "";
+        foreach (p; parts)
+        {
+            res ~= p.toString(pb);
+        }
+        return res;
+    }
+}
+
+Part composite(P...)(P parts)
+{
+    return new Composite([parts]);
 }
 
 class PadRight : Part
@@ -142,6 +232,14 @@ class Center : Part
     override string toString(Progressbar pb)
     {
         return p.toString(pb).center(width, filler);
+    }
+}
+
+class Message : Part
+{
+    override string toString(Progressbar pb)
+    {
+        return pb.message;
     }
 }
 
@@ -193,6 +291,7 @@ public enum BULLETS = [
         "*     ", " *    ", "  *   ", "   *  ", "    * ", "     *", "    * ",
         "   *  ", "  *   ", " *    ", "*     ",
     ];
+
 class Spinner(T) : Part
 {
     private int idx = 0;

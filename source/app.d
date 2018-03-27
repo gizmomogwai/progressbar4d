@@ -1,12 +1,18 @@
 import std.stdio;
+import std.string;
 
 import progressbar;
 
-void run(Progressbar pb)
+void run(ProgressbarUI pb)
 {
-    for (int i = 0; i < 30; ++i)
+    pb.step(0);
+    pb.message("before start");
+    writeln(pb.toString);
+
+    for (int i = 0; i < 25; ++i)
     {
-        pb.step;
+        pb.step(4);
+        pb.message(" message %s".format(i));
         std.stdio.write(pb.toString ~ "\r");
         stdout.flush;
 
@@ -14,18 +20,33 @@ void run(Progressbar pb)
 
         Thread.sleep(50.msecs);
     }
+
+    pb.step(0);
+    pb.message("finished");
+    writeln(pb.toString);
 }
 
 void runSpinner(T)(T[] ticks)
 {
-    run(new Progressbar(textUi(spinner(ticks, 1)), 100, 0));
-    run(new Progressbar(textUi(spinner(ticks, -1)), 100, 0));
+    // dfmt off
+    run(textUi(new Progressbar(100, 0),
+               new PadRight(30,
+                   composite(
+                       spinner(ticks, 1),
+                       new Message)),
+               new PercentageBar(20),
+               new PadLeft(5, new Percentage)));
+    // dfmt on
 }
 
 void main()
 {
+
+    /*
     auto pb = new Progressbar(textUi(new PadLeft(5, new Percentage, '.'),
             new Center(8, new Percentage, '.'), new Center(20, new Speed)), 100, 0);
+    run(pb);
+  */
     runSpinner(ROUND);
     runSpinner(TWO_ROUND);
     runSpinner(THREE_ROUND);
@@ -51,5 +72,4 @@ void main()
     runSpinner(BRAILLE);
     runSpinner(UPDOWN);
     runSpinner(SLASH);
-    run(pb);
 }
