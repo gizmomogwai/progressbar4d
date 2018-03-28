@@ -1,3 +1,7 @@
 * Ascii progressbar
 
-*** TODO 
+** TODO something like 
+for (T x : ProgressBar.wrap(collection, "TaskName")) {
+    ...
+    // Progress will be automatically monitored by a progress bar
+}

@@ -3,7 +3,7 @@ description "Ascii progressbar."
 authors "Christian Köstlin"
 copyright "Copyright © 2018, Christian Köstlin"
 license "proprietary"
-
+dependency "dime" version="~>0.0.3"
 // dependency "colored" version="~>0.0.13"
 
 configuration "library" {

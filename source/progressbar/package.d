@@ -87,7 +87,7 @@ class TextProgressbarUI : ProgressbarUI
         {
             res ~= p.toString(pb);
         }
-        return res.join("|").to!string;
+        return res.join("").to!string;
     }
 }
 
@@ -157,22 +157,70 @@ class Speed : Part
     }
 }
 
-class ETA : Part {
+class DurationPart : Part {
   import std.datetime.stopwatch;
   StopWatch sw;
+  import unit;
+  static immutable DURATION =
+    Unit("duration",
+         [
+           Unit.Scale("s", 1),
+           Unit.Scale("m", 60),
+           Unit.Scale("h", 60),
+         ]);
+  static immutable UNKNOWN = "--:--:--";
   override string toString(Progressbar pb)
   {
-    import core.time;
-    import std.conv;
     if (!sw.running)
     {
       sw.start;
     }
+    return "";
+  }
+}
+
+class TotalDuration : DurationPart {
+  override string toString(Progressbar pb)
+  {
+    import core.time;
+    import std.conv;
+
+    super.toString(pb);
+
+    auto duration = float(sw.peek.total!"msecs");
+    import std.math;
+    auto totalTime = round(duration / pb.currentProgress / 1000);
+    if (totalTime.isNaN) {
+      return UNKNOWN;
+    }
+
+    return DURATION
+      .transform(totalTime.to!int)
+      .map!((part) => "%02d".format(part.value))
+      .join(":");
+
+  }
+}
+
+class RestDuration : DurationPart {
+
+  override string toString(Progressbar pb)
+  {
+    import core.time;
+    import std.conv;
+    super.toString(pb);
+
     auto duration = float(sw.peek.total!"msecs");
     auto totalTime = duration / pb.currentProgress;
     import std.math;
     auto eta = round((totalTime - duration) / 1000);
-    return "%s".format(eta);
+    if (eta.isNaN) {
+      return "--:--:--";
+    }
+    return DURATION
+      .transform(eta.to!int)
+      .map!((part) => "%02d".format(part.value))
+      .join(":");
   }
 }
 
@@ -261,7 +309,16 @@ class Message : Part
         return pb.message;
     }
 }
-
+class Separator : Part {
+  string separator;
+  this(string separator) {
+    this.separator = separator;
+  }
+  override string toString(Progressbar pb)
+  {
+    return separator;
+  }
+}
 public enum BRAILLE = ['⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷'];
 public enum UPDOWN = ['⠁', '⠂', '⠄', '⡀', '⢀', '⠠', '⠐', '⠈'];
 public enum SLASH = ['|', '/', '-', '\\'];

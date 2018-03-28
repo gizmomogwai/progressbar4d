@@ -12,7 +12,7 @@ void run(ProgressbarUI pb)
     for (int i = 0; i < 100; ++i)
     {
         pb.step(1);
-        pb.message(" message %s".format(i));
+        pb.message("message %s".format(i));
         std.stdio.write(pb.toString ~ "\r");
         stdout.flush;
 
@@ -30,13 +30,22 @@ void runSpinner(T)(T[] ticks)
 {
     // dfmt off
     run(textUi(new Progressbar(100, 0),
+               new Separator("|"),
                new PadRight(30,
                    composite(
                        spinner(ticks, 1),
-                       new Message)),
+                       new Separator(" - "),
+                       new Message),
+               ),
+               new Separator(" |"),
                new PercentageBar(20),
+               new Separator("| "),
                new PadLeft(5, new Percentage),
-               new PadLeft(10, new ETA),
+               new Separator("% | "),
+               new PadLeft(8, new RestDuration),
+               new Separator(" | "),
+               new PadLeft(8, new TotalDuration),
+               new Separator(" |"),
         ));
     // dfmt on
 }
