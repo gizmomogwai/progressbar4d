@@ -58,6 +58,8 @@ void main()
             new Center(8, new Percentage, '.'), new Center(20, new Speed)), 100, 0);
     run(pb);
   */
+    run(textUi(new Progressbar(100, 0), "|%30(%s - %m) |%30P| %p | %r | %t |"));
+    run(textUi(new Progressbar(100, 0), "|%30(%s - %m - %m) |%30P| %p | %r | %t |"));
     runSpinner(ROUND);
     runSpinner(TWO_ROUND);
     runSpinner(THREE_ROUND);

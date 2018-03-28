@@ -96,6 +96,152 @@ auto textUi(P...)(Progressbar pb, P parts)
     return new TextProgressbarUI(pb, [parts]);
 }
 
+struct Parser
+{
+    string data;
+    this(string s)
+    {
+        this.data = s;
+    }
+
+    auto parseFormat()
+    {
+        data.popFront;
+        auto width = parseOptionalWidth;
+        if (data.empty)
+        {
+            throw new Exception("Expected format specifier");
+        }
+        auto p = data.front;
+        data.popFront;
+        switch (p)
+        {
+        case 's':
+            return spinner(THREE_ROUND);
+        case 'm':
+            return width == -1 ? new Message : new PadRight(width, new Message(width));
+        case 'P':
+            return new PercentageBar(width == -1 ? 20 : width);
+        case 'p':
+            return new PadLeft(5, new Percentage);
+        case 'S':
+            return new Speed;
+        case 't':
+            return new TotalDuration;
+        case 'r':
+            return new RestDuration;
+        case '(':
+            return parseComposite(width);
+        default:
+            throw new Exception("unkown format %s".format(data.front));
+        }
+    }
+
+    auto parseComposite(int width)
+    {
+        if (data.empty)
+        {
+            throw new Exception("composite not finished, did not find )");
+        }
+
+        Part[] res;
+        if (data.front == ')')
+        {
+            data.popFront;
+            return width == -1 ? new Composite(res) : new PadRight(width, new Composite(res, width));
+        }
+        Part n = next;
+        while (true)
+        {
+            res ~= n;
+            if (data.empty)
+            {
+                throw new Exception("composite not finished");
+            }
+            if (data.front == ')')
+            {
+                data.popFront;
+                return width == -1 ? new Composite(res) : new PadRight(width,
+                        new Composite(res, width));
+            }
+            n = next;
+        }
+    }
+
+    auto parseText()
+    {
+        string res = "";
+        while (true)
+        {
+            if (data.empty)
+            {
+                return res.length > 0 ? new Separator(res) : null;
+            }
+            else if (data.front != '%')
+            {
+                res ~= data.front;
+                data.popFront;
+            }
+            else
+            {
+                return new Separator(res);
+            }
+        }
+    }
+
+    Part next()
+    {
+        if (data.empty)
+        {
+            return null;
+        }
+
+        if (data.front == '%')
+        {
+            return parseFormat;
+        }
+        else
+        {
+            return parseText;
+        }
+    }
+
+    int parseOptionalWidth()
+    {
+        import std.ascii;
+
+        string h = "";
+        if (data.empty)
+        {
+            return -1;
+        }
+
+        while (data.front.isDigit)
+        {
+            h ~= data.front;
+            data.popFront;
+        }
+        if (h.length == 0)
+        {
+            return -1;
+        }
+        return h.to!int;
+    }
+}
+
+auto textUi(Progressbar pb, string format)
+{
+    auto p = new Parser(format);
+    Part[] parts;
+    auto n = p.next;
+    while (n !is null)
+    {
+        parts ~= n;
+        n = p.next;
+    }
+    return new TextProgressbarUI(pb, parts);
+}
+
 class Percentage : Part
 {
     override string toString(Progressbar pb)
@@ -157,71 +303,71 @@ class Speed : Part
     }
 }
 
-class DurationPart : Part {
-  import std.datetime.stopwatch;
-  StopWatch sw;
-  import unit;
-  static immutable DURATION =
-    Unit("duration",
-         [
-           Unit.Scale("s", 1),
-           Unit.Scale("m", 60),
-           Unit.Scale("h", 60),
-         ]);
-  static immutable UNKNOWN = "--:--:--";
-  override string toString(Progressbar pb)
-  {
-    if (!sw.running)
+class DurationPart : Part
+{
+    import std.datetime.stopwatch;
+
+    StopWatch sw;
+    import unit;
+
+    static immutable DURATION = Unit("duration", [Unit.Scale("s", 1),
+            Unit.Scale("m", 60), Unit.Scale("h", 60),]);
+    static immutable UNKNOWN = "--:--:--";
+    override string toString(Progressbar pb)
     {
-      sw.start;
+        if (!sw.running)
+        {
+            sw.start;
+        }
+        return "";
     }
-    return "";
-  }
 }
 
-class TotalDuration : DurationPart {
-  override string toString(Progressbar pb)
-  {
-    import core.time;
-    import std.conv;
+class TotalDuration : DurationPart
+{
+    override string toString(Progressbar pb)
+    {
+        import core.time;
+        import std.conv;
 
-    super.toString(pb);
+        super.toString(pb);
 
-    auto duration = float(sw.peek.total!"msecs");
-    import std.math;
-    auto totalTime = round(duration / pb.currentProgress / 1000);
-    if (totalTime.isNaN) {
-      return UNKNOWN;
+        auto duration = float(sw.peek.total!"msecs");
+        import std.math;
+
+        auto totalTime = round(duration / pb.currentProgress / 1000);
+        if (totalTime.isNaN)
+        {
+            return UNKNOWN;
+        }
+
+        return DURATION.transform(totalTime.to!int)
+            .map!((part) => "%02d".format(part.value)).join(":");
+
     }
-
-    return DURATION
-      .transform(totalTime.to!int)
-      .map!((part) => "%02d".format(part.value))
-      .join(":");
-
-  }
 }
 
-class RestDuration : DurationPart {
+class RestDuration : DurationPart
+{
 
-  override string toString(Progressbar pb)
-  {
-    import core.time;
-    import std.conv;
-    super.toString(pb);
+    override string toString(Progressbar pb)
+    {
+        import core.time;
+        import std.conv;
 
-    auto duration = float(sw.peek.total!"msecs");
-    auto totalTime = duration / pb.currentProgress;
-    import std.math;
-    auto eta = round((totalTime - duration) / 1000);
-    if (eta.isNaN) {
-      return "--:--:--";
+        super.toString(pb);
+
+        auto duration = float(sw.peek.total!"msecs");
+        auto totalTime = duration / pb.currentProgress;
+        import std.math;
+
+        auto eta = round((totalTime - duration) / 1000);
+        if (eta.isNaN)
+        {
+            return "--:--:--";
+        }
+        return DURATION.transform(eta.to!int).map!((part) => "%02d".format(part.value)).join(":");
     }
-    return DURATION
-      .transform(eta.to!int)
-      .map!((part) => "%02d".format(part.value))
-      .join(":");
-  }
 }
 
 class PadLeft : Part
@@ -245,9 +391,11 @@ class PadLeft : Part
 class Composite : Part
 {
     Part[] parts;
-    this(Part[] parts)
+    int maxWidth;
+    this(Part[] parts, int maxWidth = -1)
     {
         this.parts = parts;
+        this.maxWidth = maxWidth;
     }
 
     override string toString(Progressbar pb)
@@ -257,7 +405,7 @@ class Composite : Part
         {
             res ~= p.toString(pb);
         }
-        return res;
+        return maxWidth == -1 ? res : res[0 .. min(maxWidth, res.length)];
     }
 }
 
@@ -304,21 +452,33 @@ class Center : Part
 
 class Message : Part
 {
+    int maxWidth;
+    this(int maxWidth = -1)
+    {
+        this.maxWidth = maxWidth;
+    }
+
     override string toString(Progressbar pb)
     {
-        return pb.message;
+        string msg = pb.message;
+        return maxWidth == -1 ? msg : msg[0 .. min(maxWidth, msg.length)];
     }
 }
-class Separator : Part {
-  string separator;
-  this(string separator) {
-    this.separator = separator;
-  }
-  override string toString(Progressbar pb)
-  {
-    return separator;
-  }
+
+class Separator : Part
+{
+    string separator;
+    this(string separator)
+    {
+        this.separator = separator;
+    }
+
+    override string toString(Progressbar pb)
+    {
+        return separator;
+    }
 }
+
 public enum BRAILLE = ['⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷'];
 public enum UPDOWN = ['⠁', '⠂', '⠄', '⡀', '⢀', '⠠', '⠐', '⠈'];
 public enum SLASH = ['|', '/', '-', '\\'];
