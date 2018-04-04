@@ -29,37 +29,35 @@ void run(ProgressbarUI pb)
 void runSpinner(T)(T[] ticks)
 {
     // dfmt off
+    
     run(textUi(new Progressbar(100, 0),
-               new Separator("|"),
-               new PadRight(30,
+    [
+               new SeparatorPart("|"),
+               new PadRightPart(30,
                    composite(
                        spinner(ticks, 1),
-                       new Separator(" - "),
-                       new Message),
+                       new SeparatorPart(" - "),
+                       new MessagePart),
                ),
-               new Separator(" |"),
-               new PercentageBar(20),
-               new Separator("| "),
-               new PadLeft(5, new Percentage),
-               new Separator("% | "),
-               new PadLeft(8, new RestDuration),
-               new Separator(" | "),
-               new PadLeft(8, new TotalDuration),
-               new Separator(" |"),
+               new SeparatorPart(" |"),
+               new PercentageBarPart(20),
+               new SeparatorPart("| "),
+               new PadLeftPart(5, new PercentagePart),
+               new SeparatorPart("% | "),
+               new PadLeftPart(8, new RestDurationPart),
+               new SeparatorPart(" | "),
+               new PadLeftPart(8, new TotalDurationPart),
+               new SeparatorPart(" |"),
+               ]
         ));
     // dfmt on
 }
 
 void main()
 {
-
-    /*
-    auto pb = new Progressbar(textUi(new PadLeft(5, new Percentage, '.'),
-            new Center(8, new Percentage, '.'), new Center(20, new Speed)), 100, 0);
-    run(pb);
-  */
-    run(textUi(new Progressbar(100, 0), "|%30(%s - %m) |%30P| %p | %r | %t |"));
-    run(textUi(new Progressbar(100, 0), "|%30(%s - %m - %m) |%30P| %p | %r | %t |"));
+    run(textUi(new Progressbar(100, 0), "|%<50(%s - %m) |%=30P| %p | %r | %t |"));
+    run(textUi(new Progressbar(100, 0), "|%>50(%s - %m - %m) |%=30P| %p | %r | %t |"));
+    run(textUi(new Progressbar(100, 0), "|%=50(%s - %m - %m) |%=30P| %p | %r | %t |"));
     runSpinner(ROUND);
     runSpinner(TWO_ROUND);
     runSpinner(THREE_ROUND);
