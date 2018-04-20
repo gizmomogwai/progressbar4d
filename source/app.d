@@ -53,11 +53,42 @@ void runSpinner(T)(T[] ticks)
     // dfmt on
 }
 
+void run(Progressbar p1, Progressbar p2, Progressbar p3, MultiProgressbarUI ui)
+{
+    writeln("before");
+    for (int i = 0; i < 30; ++i)
+    {
+        p1.step(1);
+        p2.step(2);
+        p3.step(3);
+        writeln(ui.toString());
+
+        import core.thread;
+
+        Thread.sleep(50.msecs);
+    }
+    writeln(ui.finish());
+    writeln("after");
+}
+
 void main()
 {
+    writeln("1 ========     ");
+    writeln("2 ========     ");
+    write("\033[2A");
+    writeln("1 ############  ");
+    writeln("2 ############  ");
+    /*
     run(textUi(new Progressbar(100, 0), "|%<50(%s - %m) |%=30P| %p | %r | %t |"));
     run(textUi(new Progressbar(100, 0), "|%>50(%s - %m - %m) |%=30P| %p | %r | %t |"));
     run(textUi(new Progressbar(100, 0), "|%=50(%s - %m - %m) |%=30P| %p | %r | %t |"));
+  */
+    auto p1 = new Progressbar(100, 0);
+    auto p2 = new Progressbar(100, 0);
+    auto p3 = new Progressbar(100, 0);
+    auto ui = multiTextUi([p1, p2, p3], ["P1 %=30P", "P2 %p", "P3 [%=30P - %p]"]); //[%=30P]", "%p", "%=30P-%p"]);
+    run(p1, p2, p3, ui);
+    /*
     runSpinner(ROUND);
     runSpinner(TWO_ROUND);
     runSpinner(THREE_ROUND);
@@ -83,4 +114,5 @@ void main()
     runSpinner(BRAILLE);
     runSpinner(UPDOWN);
     runSpinner(SLASH);
+    */
 }

@@ -241,3 +241,40 @@ auto textUi(Progressbar pb, string format)
     }
     return new TextProgressbarUI(pb, parts);
 }
+
+class MultiProgressbarUI
+{
+    import std.algorithm;
+
+    TextProgressbarUI[] textProgressbars;
+    this(TextProgressbarUI[] textProgressbars)
+    {
+        this.textProgressbars = textProgressbars;
+    }
+
+    override string toString()
+    {
+        return textProgressbars.map!(pb => pb.toString ~ "\n")
+            .join("") ~ "\033[%dA".format(textProgressbars.length + 1);
+    }
+
+    string finish()
+    {
+        return iota(textProgressbars.length - 1).map!(i => "\n").join("");
+    }
+}
+
+auto multiTextUi(Progressbar[] progressbars, string[] formats)
+{
+    if (progressbars.length != formats.length)
+    {
+        throw new Exception("progressbars and formats must have same size");
+    }
+
+    import std.range;
+    import std.algorithm;
+
+    auto res = appender!(TextProgressbarUI[]);
+    return new MultiProgressbarUI(zip(progressbars, formats)
+            .map!(pair => textUi(pair[0], pair[1])).array);
+}
