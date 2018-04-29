@@ -201,7 +201,7 @@ class PercentageBarPart : Part
     size_t width;
     this(size_t width)
     {
-        this.width = width;
+        this.width = width == -1 ? 30 : width;
     }
 
     override string toString(Progressbar pb)

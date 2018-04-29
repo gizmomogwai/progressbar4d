@@ -4,15 +4,9 @@ authors "Christian Köstlin"
 copyright "Copyright © 2018, Christian Köstlin"
 license "proprietary"
 dependency "dime" version="~>0.0.3"
-// dependency "colored" version="~>0.0.13"
 
 configuration "library" {
   targetPath "out/lib"
-}
-
-configuration "example" {
-  targetPath "out/main"
-  targetType "executable"
 }
 
 configuration "unittest" {
@@ -23,5 +17,4 @@ configuration "unittest" {
   dependency "unit-threaded" version="~>0.7.41"
   preBuildCommands "dub run unit-threaded -c gen_ut_main -- -f out/generated/unit-threaded/testsuite.d"
   mainSourceFile "out/generated/unit-threaded/testsuite.d"
-  excludedSourceFiles "source/app.d"
 }
