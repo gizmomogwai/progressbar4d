@@ -1,17 +1,35 @@
+/++
+ + Authors: Christian Köstlin
+ + Copyright: Copyright © 2018, Christian Köstlin
+ + License: MIT
+ +/
+
 module progressbar.parser;
 
 import std.string;
 import std.range;
 import std.conv;
 
-import progressbar;
+import progressbar.parts;
+public import progressbar;
 
 struct Parser
 {
+    string original;
     string data;
     this(string s)
     {
+        this.original = s;
         this.data = s;
+    }
+
+    private Exception exceptionWithPosition(string msg, size_t pos = -1)
+    {
+        if (pos == -1)
+        {
+            pos = data.ptr - original.ptr;
+        }
+        return new Exception("%s at %d".format(msg, data.ptr - original.ptr));
     }
 
     auto parseFormat()
@@ -19,30 +37,32 @@ struct Parser
         auto padding = parsePadding;
         if (data.empty)
         {
-            throw new Exception("Expected format specifier");
+            throw exceptionWithPosition("Expected format specifier");
         }
         auto p = data.front;
         data.popFront;
         switch (p)
         {
-        case 's':
-            return padding.pad(spinner(THREE_ROUND));
+        case '(':
+            return padding.pad(parseComposite());
         case 'm':
             return padding.pad(new MessagePart(padding.width)); // todo message with maxwidth
-        case 'P':
-            return padding.pad(new PercentageBarPart(padding.width)); // todo bar with width
         case 'p':
             return padding.pad(new PadLeftPart(5, new PercentagePart));
+        case 'P':
+            return padding.pad(new PercentageBarPart(padding.width)); // todo bar with width
+        case 'r':
+            return padding.pad(new RestDurationPart);
+        case 's':
+            return padding.pad(spinner(THREE_ROUND));
         case 'S':
             return padding.pad(new SpeedPart);
         case 't':
+            return padding.pad(new CurrentDurationPart);
+        case 'T':
             return padding.pad(new TotalDurationPart);
-        case 'r':
-            return padding.pad(new RestDurationPart);
-        case '(':
-            return padding.pad(parseComposite());
         default:
-            throw new Exception("unkown format %s".format(data.front));
+            throw new Exception("unkown format %s".format(p));
         }
     }
 
@@ -50,7 +70,7 @@ struct Parser
     {
         if (data.empty)
         {
-            throw new Exception("composite not finished, did not find )");
+            throw exceptionWithPosition("composite not finished, did not find )");
         }
 
         Part[] res;
@@ -66,7 +86,7 @@ struct Parser
             res ~= n;
             if (data.empty)
             {
-                throw new Exception("composite not finished");
+                throw exceptionWithPosition("composite not finished");
             }
             if (data.front == ')')
             {
@@ -153,7 +173,7 @@ struct Parser
     {
         if (data.empty)
         {
-            throw new Exception("expected data");
+            throw exceptionWithPosition("expected data for padding");
         }
 
         return paddingFor(parseAlignment, parseWidth);
@@ -169,18 +189,19 @@ struct Parser
             }
             else
             {
-                throw new Exception("padding (%s) without width given".format(pad));
+                throw exceptionWithPosition("padding (%s) without width given".format(pad));
             }
         }
         else
         {
             if (pad == Pad.NONE)
             {
-                throw new Exception(
+                throw exceptionWithPosition(
                         "width (%s) without padding direction given".format(widthString));
             }
             else
             {
+
                 auto width = widthString.to!int;
                 return Padding.from(pad, width);
             }
@@ -213,68 +234,12 @@ struct Parser
     {
         import std.ascii;
 
-        string res = "";
+        auto res = "";
         while (!data.empty && data.front.isDigit)
         {
             res ~= data.front;
             data.popFront;
         }
         return res;
-
     }
-}
-
-auto textUi(Progressbar pb, Part[] parts)
-{
-    return new TextProgressbarUI(pb, parts);
-}
-
-auto textUi(Progressbar pb, string format)
-{
-    auto p = new Parser(format);
-    Part[] parts;
-    auto n = p.next;
-    while (n !is null)
-    {
-        parts ~= n;
-        n = p.next;
-    }
-    return new TextProgressbarUI(pb, parts);
-}
-
-class MultiProgressbarUI
-{
-    import std.algorithm;
-
-    TextProgressbarUI[] textProgressbars;
-    this(TextProgressbarUI[] textProgressbars)
-    {
-        this.textProgressbars = textProgressbars;
-    }
-
-    override string toString()
-    {
-        return textProgressbars.map!(pb => pb.toString ~ "\n")
-            .join("") ~ "\033[%dA".format(textProgressbars.length + 1);
-    }
-
-    string finish()
-    {
-        return iota(textProgressbars.length - 1).map!(i => "\n").join("");
-    }
-}
-
-auto multiTextUi(Progressbar[] progressbars, string[] formats)
-{
-    if (progressbars.length != formats.length)
-    {
-        throw new Exception("progressbars and formats must have same size");
-    }
-
-    import std.range;
-    import std.algorithm;
-
-    auto res = appender!(TextProgressbarUI[]);
-    return new MultiProgressbarUI(zip(progressbars, formats)
-            .map!(pair => textUi(pair[0], pair[1])).array);
 }

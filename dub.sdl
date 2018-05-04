@@ -2,12 +2,31 @@ name "progressbar"
 description "Ascii progressbar."
 authors "Christian Köstlin"
 copyright "Copyright © 2018, Christian Köstlin"
-license "proprietary"
+license "MIT"
 dependency "dime" version="~>0.0.3"
+
+x:ddoxFilterArgs "--min-protection=Public"
 
 configuration "library" {
   targetPath "out/lib"
 }
+
+configuration "basic" {
+  targetType "executable"
+  targetPath "out/main"
+  mainSourceFile "examples/basic.d"
+}
+configuration "feature_tour" {
+  targetType "executable"
+  targetPath "out/main"
+  mainSourceFile "examples/feature_tour.d"
+}
+configuration "range_decorator" {
+  targetType "executable"
+  targetPath "out/main"
+  mainSourceFile "examples/range_decorator.d"
+}
+
 
 configuration "unittest" {
   targetType "executable"
@@ -17,4 +36,11 @@ configuration "unittest" {
   dependency "unit-threaded" version="~>0.7.41"
   preBuildCommands "dub run unit-threaded -c gen_ut_main -- -f out/generated/unit-threaded/testsuite.d"
   mainSourceFile "out/generated/unit-threaded/testsuite.d"
+}
+
+configuration "fuzz-parser" {
+  targetType "executable"
+  mainSourceFile "fuzzing/parser.d"
+  buildOptions "debugMode"
+  dflags "-fsanitize=fuzzer,address"
 }

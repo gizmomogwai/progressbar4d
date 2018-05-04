@@ -1,19 +1,23 @@
-/+ dub.sdl:
-name "basic"
-dependency "progressbar" path="../"
-+/
+import progressbar.parser;
 
-import progressbar;
 import std.stdio;
+import std.range;
+import std.typecons;
 
 int main(string[] args)
 {
     auto pb = new Progressbar(100, 0);
-    auto ui = textUi(pb, "%=30P %p");
+    auto ui = textUi(pb, "abc%=30p");
     pb.message("hello world");
+    for (int i = 0; i < 10; ++i)
+    {
+        pb.step(1);
+        write(ui.toString() ~ "\r");
+    }
+    writeln(ui.toString());
+    pb.step(20);
+    writeln(ui.toString());
     pb.step(10);
-    writeln("123", ui.toString());
-    pb.step(10);
-    writeln("456", ui.toString);
+    writeln(ui.toString);
     return 0;
 }

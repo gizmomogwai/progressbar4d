@@ -1,13 +1,7 @@
-/+
- dub.sdl:
- name "feature_tour"
- dependency "progressbar" path="../"
- dependency "colored" version="~>0.0.13"
- +/
-
 import std.stdio;
 import std.string;
 
+import progressbar.parts;
 import progressbar;
 
 void run(ProgressbarUI pb)
@@ -60,7 +54,7 @@ void runSpinner(T)(T[] ticks)
     // dfmt on
 }
 
-void run(Progressbar p1, Progressbar p2, Progressbar p3, MultiProgressbarUI ui)
+void run(Progressbar p1, Progressbar p2, Progressbar p3, MultiProgressbarTextUI ui)
 {
     writeln("before");
     for (int i = 0; i < 30; ++i)
@@ -80,11 +74,10 @@ void run(Progressbar p1, Progressbar p2, Progressbar p3, MultiProgressbarUI ui)
 
 void main()
 {
-    /*
-    run(textUi(new Progressbar(100, 0), "|%<50(%s - %m) |%=30P| %p | %r | %t |"));
-    run(textUi(new Progressbar(100, 0), "|%>50(%s - %m - %m) |%=30P| %p | %r | %t |"));
-    run(textUi(new Progressbar(100, 0), "|%=50(%s - %m - %m) |%=30P| %p | %r | %t |"));
-  */
+    run(textUi(new Progressbar(100, 0), "1|%<50(%s - %m) |%=30P| %p | %r | %t | %T"));
+    run(textUi(new Progressbar(100, 0), "2|%>50(%s - %m) |%=30P| %p | %r | %t |"));
+    run(textUi(new Progressbar(100, 0), "3|%=50(%s - %m) |%=30P| %p | %r | %t |"));
+
     import colored;
 
     auto p1 = new Progressbar(100, 0);
@@ -93,7 +86,6 @@ void main()
     auto ui = multiTextUi([p1, p2, p3], ["P1 %=30P".red.toString,
             "P2 %p".green.toString, "P3 [%=30P - %p]".blue.toString]); //[%=30P]", "%p", "%=30P-%p"]);
     run(p1, p2, p3, ui);
-    /*
     runSpinner(ROUND);
     runSpinner(TWO_ROUND);
     runSpinner(THREE_ROUND);
@@ -119,5 +111,4 @@ void main()
     runSpinner(BRAILLE);
     runSpinner(UPDOWN);
     runSpinner(SLASH);
-    */
 }

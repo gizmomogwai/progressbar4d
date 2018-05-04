@@ -13,3 +13,5 @@ progressbar-test-*
 *.obj
 *.lst
 out
+.vscode
+/progressbar

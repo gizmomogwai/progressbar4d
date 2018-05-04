@@ -1,3 +1,9 @@
+/++
+ + Authors: Christian Köstlin
+ + Copyright: Copyright © 2018, Christian Köstlin
+ + License: MIT
+ +/
+
 module progressbar.parts;
 
 import progressbar;
@@ -140,6 +146,24 @@ class DurationPart : Part
     }
 }
 
+class CurrentDurationPart : DurationPart
+{
+    override string toString(Progressbar pb)
+    {
+        import core.time;
+        import std.conv;
+        import std.algorithm;
+
+        super.toString(pb);
+
+        auto duration = float(sw.peek.total!"seconds");
+        import std.math;
+
+        return DURATION.transform(duration.to!int)
+            .map!((part) => "%02d".format(part.value)).join(":");
+    }
+}
+
 class TotalDurationPart : DurationPart
 {
     override string toString(Progressbar pb)
@@ -161,7 +185,6 @@ class TotalDurationPart : DurationPart
 
         return DURATION.transform(totalTime.to!int)
             .map!((part) => "%02d".format(part.value)).join(":");
-
     }
 }
 

@@ -1,3 +1,9 @@
+/++
+ + Authors: Christian Köstlin
+ + Copyright: Copyright © 2018, Christian Köstlin
+ + License: MIT
+ +/
+
 module progressbar.spinner;
 import std.string;
 import progressbar;

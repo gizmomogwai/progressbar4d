@@ -1,7 +1,8 @@
 * Ascii progressbar
 
-** TODO something like 
-for (T x : ProgressBar.wrap(collection, "TaskName")) {
-    ...
-    // Progress will be automatically monitored by a progress bar
-}
+
+** Prior art
+- [[https://github.com/jfelchner/ruby-progressbar][ruby-progressbar]] - ascii progressbar in ruby
+- [[https://github.com/tqdm/tqdm][tqdm]] - python implementation of a progressbar
+- [[https://github.com/mitsuhiko/indicatif][indicatif]] - indicatif for rust
+- [[https://github.com/ShigekiKarita/snck][snck]] - snck dlang/dub package
