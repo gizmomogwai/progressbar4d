@@ -5,6 +5,7 @@
  +/
 
 module progressbar;
+
 import std.stdio;
 import std.range;
 import std.conv;
