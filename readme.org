@@ -8,3 +8,4 @@
 - [[https://github.com/ShigekiKarita/snck][snck]] - snck dlang/dub package
 [[https://github.com/gizmomogwai/progressbar4d][https://img.shields.io/github/tag/gizmomogwai/progressbar4d.svg?style=flat-square]]
 [[https://travis-ci.org/gizmomogwai/progressbar4d][https://img.shields.io/travis/gizmomogwai/progressbar4d/master.svg?style=flat-square]]
+[[https://codecov.io/gh/gizmomogwai/progressbar4d][https://img.shields.io/codecov/c/github/gizmomogwai/progressbar4d/master.svg?style=flat-square]]
