@@ -6,3 +6,4 @@
 - [[https://github.com/tqdm/tqdm][tqdm]] - python implementation of a progressbar
 - [[https://github.com/mitsuhiko/indicatif][indicatif]] - indicatif for rust
 - [[https://github.com/ShigekiKarita/snck][snck]] - snck dlang/dub package
+[[https://github.com/gizmomogwai/progressbar4d][https://img.shields.io/github/tag/gizmomogwai/progressbar4d.svg?style=flat-square]]
