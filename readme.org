@@ -10,4 +10,4 @@
 [[https://travis-ci.org/gizmomogwai/progressbar4d][https://img.shields.io/travis/gizmomogwai/progressbar4d/master.svg?style=flat-square]]
 [[https://codecov.io/gh/gizmomogwai/progressbar4d][https://img.shields.io/codecov/c/github/gizmomogwai/progressbar4d/master.svg?style=flat-square]]
 [[https://gizmomogwai.github.io/progressbar4d][https://img.shields.io/readthedocs/pip.svg?style=flat-square]]
-[[http://code.dlang.org/packages/progressbar][https://img.shields.io/dub/v/progressbar.svg?style=flat-square]][[http://code.dlang.org/packages/progressbar][https://img.shields.io/dub/l/progressbar.svg?style=flat-square]]
+[[http://code.dlang.org/packages/progressbar][https://img.shields.io/dub/v/progressbar.svg?style=flat-square]][[http://code.dlang.org/packages/progressbar][https://img.shields.io/dub/l/progressbar.svg?style=flat-square]][[http://code.dlang.org/packages/progressbar][https://img.shields.io/dub/dw/progressbar.svg?style=flat-square]]
