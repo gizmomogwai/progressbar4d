@@ -1,0 +1,13 @@
+name "progressbar-fuzzing"
+description "Fuzzing for progressbar"
+authors "Christian Koestlin"
+copyright "Copyright (c) 2018, Christian Koestlin"
+license "MIT"
+
+targetName  "progressbar-fuzzing"
+targetPath "out/main"
+
+dependency "progressbar" path=".."
+
+buildOptions "debugMode"
+dflags "-fsanitize=fuzzer,address"

@@ -1,9 +1,9 @@
 name "progressbar"
 description "Ascii progressbar."
-authors "Christian Köstlin"
-copyright "Copyright © 2018, Christian Köstlin"
+authors "Christian Koestlin"
+copyright "Copyright (c) 2018, Christian Koestlin"
 license "MIT"
-dependency "dime" version="~>0.0.3"
+dependency "dime" version="~>0.0.5"
 
 x:ddoxFilterArgs "--min-protection=Public"
 
@@ -11,40 +11,17 @@ configuration "library" {
   targetPath "out/lib"
 }
 
-configuration "basic" {
-  targetType "executable"
-  targetPath "out/main"
-  mainSourceFile "examples/basic.d"
-}
-configuration "feature_tour" {
-  targetType "executable"
-  targetPath "out/main"
-  mainSourceFile "examples/feature_tour.d"
-}
-configuration "range_decorator" {
-  targetType "executable"
-  targetPath "out/main"
-  mainSourceFile "examples/range_decorator.d"
-}
-
-
 configuration "unittest" {
   targetType "executable"
   targetName "unittest"
   targetPath "out/test"
 
-  dependency "unit-threaded" version="~>0.7.41"
+  dependency "unit-threaded" version="~>0.8.0"
   preBuildCommands "dub run unit-threaded -c gen_ut_main -- -f out/generated/unit-threaded/testsuite.d"
   mainSourceFile "out/generated/unit-threaded/testsuite.d"
 }
 
-configuration "fuzz-parser" {
-  targetType "executable"
-  mainSourceFile "fuzzing/parser.d"
-  buildOptions "debugMode"
-  dflags "-fsanitize=fuzzer,address"
-}
-
+sourcePaths "source" "out/generated/packageversion"
+importPaths "source" "out/generated/packageversion"
 preGenerateCommands "packageversion || dub run packageversion"
-sourceFiles "out/generated/packageversion/progressbar/packageversion.d"
-dependency "packageversion" version="~>0.0.17"
+dependency "packageversion" version="~>0.0.18"

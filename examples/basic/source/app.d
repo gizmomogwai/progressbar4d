@@ -14,10 +14,10 @@ int main(string[] args)
         pb.step(1);
         write(ui.toString() ~ "\r");
     }
-    writeln(ui.toString());
+    ui.toString.writeln;
     pb.step(20);
-    writeln(ui.toString());
+    ui.toString.writeln;
     pb.step(10);
-    writeln(ui.toString);
+    ui.toString.writeln;
     return 0;
 }

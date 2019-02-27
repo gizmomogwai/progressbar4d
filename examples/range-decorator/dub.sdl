@@ -1,0 +1,10 @@
+name "progressbar-example-range"
+description "Range decorator for progressbar"
+authors "Christian Koestlin"
+copyright "Copyright (c) 2018, Christian Koestlin"
+license "MIT"
+
+targetName  "progressbar-example-range"
+targetPath "out/main"
+
+dependency "progressbar" path="../.."
