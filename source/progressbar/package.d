@@ -1,6 +1,6 @@
 /++
- + Authors: Christian Koestlin, Christian Köstlin
- + Copyright: Copyright © 2018, Christian Köstlin
+ + Authors: Christian Koestlin
+ + Copyright: Copyright (C) 2018, Christian Koestlin
  + License: MIT
  +/
 
