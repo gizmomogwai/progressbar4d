@@ -252,6 +252,9 @@ class PercentageBarPart : Part
     }
 }
 
+/++
+ + Speed in items / s
+ +/
 class SpeedPart : Part
 {
     import std.datetime.stopwatch;

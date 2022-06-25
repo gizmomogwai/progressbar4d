@@ -3,12 +3,13 @@ description "Ascii progressbar."
 authors "Christian Koestlin"
 copyright "Copyright (c) 2018, Christian Koestlin"
 license "MIT"
-dependency "dime" version="~>0.0.5"
+dependency "dime" version="~>0.0.7"
 
 x:ddoxFilterArgs "--min-protection=Public"
 
 configuration "library" {
   targetPath "out/lib"
+  excludedSourceFiles "source/testsuite.d"
 }
 
 configuration "unittest" {
@@ -16,12 +17,6 @@ configuration "unittest" {
   targetName "unittest"
   targetPath "out/test"
 
-  dependency "unit-threaded" version="~>0.8.0"
-  preBuildCommands "dub run unit-threaded -c gen_ut_main -- -f out/generated/unit-threaded/testsuite.d"
-  mainSourceFile "out/generated/unit-threaded/testsuite.d"
+  dependency "unit-threaded" version="~>2.0.4"
+  mainSourceFile "source/testsuite.d"
 }
-
-sourcePaths "source" "out/generated/packageversion"
-importPaths "source" "out/generated/packageversion"
-preGenerateCommands "packageversion || dub run packageversion"
-dependency "packageversion" version="~>0.0.18"

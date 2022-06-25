@@ -242,3 +242,9 @@ auto withTextUi(Range)(Range range, string format)
 
     return Wrapper!Range(range, format);
 }
+
+@("hello world") unittest
+{
+    import unit_threaded;
+    2.should == 2;
+}
