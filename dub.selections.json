@@ -1,11 +1,11 @@
 {
 	"fileVersion": 1,
 	"versions": {
-		"asciitable": "0.0.14",
+		"asciitable": "0.0.16",
 		"color": "0.0.9",
-		"colored": "0.0.27",
+		"colored": "0.0.28",
 		"dime": "0.0.8",
 		"packageversion": "0.0.18",
-		"unit-threaded": "2.0.4"
+		"unit-threaded": "2.1.1"
 	}
 }
